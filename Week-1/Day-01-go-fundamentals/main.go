@@ -1,7 +1,18 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
-    fmt.Println("Welcome to Week-1/Day-01-go-fundamentals!")
+	var name string
+	fmt.Print("Enter your name: ")
+	fmt.Scan(&name)
+
+	message := greet(name)
+	fmt.Println(message)
+}
+
+func greet(name string) string {
+	return "Hello, " + name + "! Welcome to Go."
 }
