@@ -1,0 +1,60 @@
+{
+  "account": {
+    "owner": "Nazar",
+    "balance": 250
+  },
+  "pocket": {
+    "owner": "Nazar",
+    "balance": 0
+  },
+  "transactions": [
+    {
+      "type": "Deposit",
+      "amount": 50,
+      "from": "Nazar",
+      "to": "Nazar"
+    },
+    {
+      "type": "Withdraw",
+      "amount": 100,
+      "from": "Nazar",
+      "to": "Nazar"
+    },
+    {
+      "type": "Deposit",
+      "amount": 50,
+      "from": "Nazar",
+      "to": "Nazar"
+    },
+    {
+      "type": "Withdraw",
+      "amount": 100,
+      "from": "Nazar",
+      "to": "Nazar"
+    },
+    {
+      "type": "Withdraw",
+      "amount": 100,
+      "from": "Nazar",
+      "to": "Nazar"
+    },
+    {
+      "type": "Deposit",
+      "amount": 250,
+      "from": "Nazar",
+      "to": "Nazar"
+    },
+    {
+      "type": "Withdraw",
+      "amount": 50,
+      "from": "Nazar",
+      "to": "Nazar"
+    },
+    {
+      "type": "Deposit",
+      "amount": 50,
+      "from": "Nazar",
+      "to": "Nazar"
+    }
+  ]
+}
