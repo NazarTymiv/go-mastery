@@ -1,0 +1,24 @@
+{
+ "account": {
+  "owner": "Nazar",
+  "balance": 0
+ },
+ "pocket": {
+  "owner": "Nazar",
+  "balance": 150
+ },
+ "transactions": [
+  {
+   "type": "deposit",
+   "amount": 50,
+   "from": "Nazar",
+   "to": "Nazar"
+  },
+  {
+   "type": "withdraw",
+   "amount": 150,
+   "from": "Nazar",
+   "to": "Nazar"
+  }
+ ]
+}
