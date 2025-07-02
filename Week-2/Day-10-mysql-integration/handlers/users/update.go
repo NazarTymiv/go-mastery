@@ -35,6 +35,14 @@ func (h UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if updatedUser.Email != "" {
+		if err := helpers.ValidateEmail(updatedUser.Email); err != nil {
+			log.Printf("Email validation error: %v", err)
+			helpers.WriteError(w, "Invalid email address", http.StatusBadRequest)
+			return
+		}
+	}
+
 	updatedUser.ID = uint8(id)
 
 	result, err := h.DB.NamedExec("UPDATE users SET name = :name, email = :email WHERE id = :id", &updatedUser)

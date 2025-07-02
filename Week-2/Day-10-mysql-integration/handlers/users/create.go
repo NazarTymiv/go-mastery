@@ -27,6 +27,12 @@ func (h UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := helpers.ValidateEmail(newUser.Email); err != nil {
+		log.Printf("Email validation error: %v", err)
+		helpers.WriteError(w, "Invalid email address", http.StatusBadRequest)
+		return
+	}
+
 	result, err := h.DB.NamedExec("INSERT INTO users (name, email) VALUES (:name, :email)", &newUser)
 	if err != nil {
 		log.Printf("Insert error: %v", err)
