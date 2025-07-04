@@ -20,6 +20,7 @@ func SetupRoutes(database *sqlx.DB) http.Handler {
 	r.Route("/api", func(r chi.Router) {
 		// Users
 		r.Get("/users", userHandler.GetAllUsers)
+		r.Get("/users/{id}", userHandler.GetUserById)
 	})
 
 	return r
