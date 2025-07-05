@@ -9,7 +9,7 @@ import (
 	"github.com/nazartymiv/go-mastery/Week-2/Day-11-crud-api/models"
 )
 
-func (h *UserHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
+func (h UserHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	var user models.User

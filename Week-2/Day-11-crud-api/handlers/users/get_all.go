@@ -8,7 +8,7 @@ import (
 	"github.com/nazartymiv/go-mastery/Week-2/Day-11-crud-api/models"
 )
 
-func (h *UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
+func (h UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	var users []models.User
 	err := h.DB.Select(&users, "SELECT * FROM users")
 	if err != nil {
