@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/nazartymiv/go-mastery/Week-2/Day-11-crud-api/handlers/accounts"
+	"github.com/nazartymiv/go-mastery/Week-2/Day-11-crud-api/handlers/transactions"
 	"github.com/nazartymiv/go-mastery/Week-2/Day-11-crud-api/handlers/users"
 )
 
@@ -18,6 +19,7 @@ func SetupRoutes(database *sqlx.DB) http.Handler {
 
 	userHandler := users.UserHandler{DB: database}
 	accountHandler := accounts.AccountHandler{DB: database}
+	transactionHandler := transactions.TransactionsHandler{DB: database}
 
 	r.Route("/api", func(r chi.Router) {
 		// Users
@@ -31,6 +33,9 @@ func SetupRoutes(database *sqlx.DB) http.Handler {
 		r.Post("/accounts", accountHandler.CreateAccount)
 		r.Get("/accounts/{user_id}", accountHandler.GetAllAccountByUserId)
 		r.Delete("/accounts/{id}", accountHandler.DeleteAccount)
+
+		// Transactions
+		r.Post("/transactions", transactionHandler.CreateTransaction)
 	})
 
 	return r
