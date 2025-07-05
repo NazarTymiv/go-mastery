@@ -36,6 +36,7 @@ func SetupRoutes(database *sqlx.DB) http.Handler {
 
 		// Transactions
 		r.Post("/transactions", transactionHandler.CreateTransaction)
+		r.Get("/transactions/{account_id}", transactionHandler.GetByAccountId)
 	})
 
 	return r

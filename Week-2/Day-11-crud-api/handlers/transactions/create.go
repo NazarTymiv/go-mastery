@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/nazartymiv/go-mastery/Week-2/Day-11-crud-api/helpers"
 	"github.com/nazartymiv/go-mastery/Week-2/Day-11-crud-api/models"
@@ -36,9 +35,7 @@ func (h TransactionsHandler) CreateTransaction(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	newTransaction.CreatedAt = time.Now()
-
-	res, err := h.DB.NamedExec("INSERT INTO transactions (account_id, amount, type, description, created_at) VALUES (:account_id, amount, type, description, created_at)", &newTransaction)
+	res, err := h.DB.NamedExec("INSERT INTO transactions (account_id, amount, type, description) VALUES (:account_id, :amount, :type, :description)", &newTransaction)
 	if err != nil {
 		log.Fatalf("Error create transaction: %v", err)
 		helpers.WriteError(w, "Could not create transaction", http.StatusInternalServerError)
