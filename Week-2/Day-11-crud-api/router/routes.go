@@ -22,6 +22,7 @@ func SetupRoutes(database *sqlx.DB) http.Handler {
 		r.Get("/users", userHandler.GetAllUsers)
 		r.Get("/users/{id}", userHandler.GetUserById)
 		r.Post("/users", userHandler.CreateUser)
+		r.Put("/users/{id}", userHandler.UpdateUserById)
 	})
 
 	return r
