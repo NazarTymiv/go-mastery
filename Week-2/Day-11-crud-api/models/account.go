@@ -3,10 +3,10 @@ package models
 import "errors"
 
 type Account struct {
-	ID          int    `db:"id" json:"id"`
-	UserID      *int   `db:"user_id" json:"user_id"`
-	AccountName string `db:"account_name" json:"account_name"`
-	Balance     int    `db:"balance" json:"balance"`
+	ID          int     `db:"id" json:"id"`
+	UserID      *int    `db:"user_id" json:"user_id"`
+	AccountName string  `db:"account_name" json:"account_name"`
+	Balance     float64 `db:"balance" json:"balance"`
 }
 
 func (a *Account) Validate() error {

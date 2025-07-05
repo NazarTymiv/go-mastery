@@ -29,6 +29,7 @@ func SetupRoutes(database *sqlx.DB) http.Handler {
 
 		// Accounts
 		r.Post("/accounts", accountHandler.CreateAccount)
+		r.Get("/accounts/{user_id}", accountHandler.GetAllAccountByUserId)
 	})
 
 	return r
