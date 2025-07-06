@@ -79,7 +79,7 @@ func (h TransactionsHandler) CreateTransaction(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	_, err = tx.NamedExec(`
+	result, err := tx.NamedExec(`
         INSERT INTO transactions (from_account_id, to_account_id, amount, type, description)
         VALUES (:from_account_id, :to_account_id, :amount, :type, :description)
     `, &newTransaction)
@@ -89,5 +89,9 @@ func (h TransactionsHandler) CreateTransaction(w http.ResponseWriter, r *http.Re
 		return
 	}
 
+	id, _ := result.LastInsertId()
+	newTransaction.ID = int(id)
+
+	w.WriteHeader(http.StatusCreated)
 	helpers.SendJson(w, newTransaction)
 }
