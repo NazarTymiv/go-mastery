@@ -9,12 +9,12 @@ import (
 	"github.com/nazartymiv/go-mastery/Week-2/Day-11-crud-api/handlers/accounts"
 	"github.com/nazartymiv/go-mastery/Week-2/Day-11-crud-api/handlers/transactions"
 	"github.com/nazartymiv/go-mastery/Week-2/Day-11-crud-api/handlers/users"
+	customMiddleware "github.com/nazartymiv/go-mastery/Week-2/Day-11-crud-api/middleware"
 )
 
 func SetupRoutes(database *sqlx.DB) http.Handler {
 	r := chi.NewRouter()
 
-	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
 	userHandler := users.UserHandler{DB: database}
@@ -22,6 +22,8 @@ func SetupRoutes(database *sqlx.DB) http.Handler {
 	transactionHandler := transactions.TransactionsHandler{DB: database}
 
 	r.Route("/api", func(r chi.Router) {
+		r.Use(customMiddleware.RequestLogger)
+
 		// Users
 		r.Get("/users", userHandler.GetAllUsers)
 		r.Get("/users/{id}", userHandler.GetUserById)
