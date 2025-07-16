@@ -22,6 +22,7 @@ func SetupRoutes(database *sqlx.DB) http.Handler {
 
 		// Users routes
 		r.Post("/users", usersHandler.CreateUser)
+		r.Delete("/users/{id}", usersHandler.DeleteUser)
 	})
 
 	return r
