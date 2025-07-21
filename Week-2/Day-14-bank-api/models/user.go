@@ -19,6 +19,7 @@ const (
 	GetUserByEmailSQL = `SELECT * FROM users WHERE email = ?`
 	CreateUserSQL     = `INSERT INTO users (name, email) VALUES(:name, :email)`
 	DeleteUserByIdSQL = `DELETE FROM users WHERE id = ?`
+	GetAllUsersSql    = `SELECT * FROM users`
 )
 
 func (u *User) Validate() error {
@@ -30,6 +31,14 @@ func (u *User) Validate() error {
 		return errors.New("email is required")
 	}
 
+	return nil
+}
+
+func GetAllUsers(users *[]User, db *sqlx.DB) error {
+	err := db.Select(users, GetAllUsersSql)
+	if err != nil {
+		return errors.New(err.Error())
+	}
 	return nil
 }
 

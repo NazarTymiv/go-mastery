@@ -21,6 +21,7 @@ func SetupRoutes(database *sqlx.DB) http.Handler {
 		r.Use(customMiddleware.RequestLogger)
 
 		// Users routes
+		r.Get("/users", usersHandler.GetAllUsers)
 		r.Post("/users", usersHandler.CreateUser)
 		r.Delete("/users/{id}", usersHandler.DeleteUser)
 	})
