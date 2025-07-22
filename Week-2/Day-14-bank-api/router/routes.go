@@ -18,13 +18,15 @@ func SetupRoutes(database *sqlx.DB) http.Handler {
 	usersHandler := users.UserHandler{DB: database}
 
 	r.Route("/api", func(r chi.Router) {
-		r.Use(customMiddleware.RequestLogger)
+		r.Route("/v1", func(r chi.Router) {
+			r.Use(customMiddleware.RequestLogger)
 
-		// Users routes
-		r.Get("/users", usersHandler.GetAllUsers)
-		r.Post("/users", usersHandler.CreateUser)
-		r.Put("/users/{id}", usersHandler.UpdateUserByID)
-		r.Delete("/users/{id}", usersHandler.DeleteUser)
+			// Users routes
+			r.Get("/users", usersHandler.GetAllUsers)
+			r.Post("/users", usersHandler.CreateUser)
+			r.Put("/users/{id}", usersHandler.UpdateUserByID)
+			r.Delete("/users/{id}", usersHandler.DeleteUser)
+		})
 	})
 
 	return r
