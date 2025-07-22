@@ -26,5 +26,5 @@ func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	helpers.SendSuccess(w, map[string]string{"message": "User has been deleted successfully"}, http.StatusOK)
+	helpers.SendSuccess(w, helpers.MessageResponse{Message: "User has been deleted successfully"}, http.StatusOK)
 }

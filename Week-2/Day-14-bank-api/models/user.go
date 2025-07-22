@@ -4,8 +4,10 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/nazartymiv/go-mastery/Week-2/Day-14-bank-api/logger"
 )
 
 type User struct {
@@ -16,10 +18,11 @@ type User struct {
 
 // SQL requests
 const (
+	GetAllUsersSql    = `SELECT * FROM users`
 	GetUserByEmailSQL = `SELECT * FROM users WHERE email = ?`
 	CreateUserSQL     = `INSERT INTO users (name, email) VALUES(:name, :email)`
+	UpdateUserSQL     = `UPDATE users SET name = :name, email = :email WHERE id = :id`
 	DeleteUserByIdSQL = `DELETE FROM users WHERE id = ?`
-	GetAllUsersSql    = `SELECT * FROM users`
 )
 
 func (u *User) Validate() error {
@@ -54,6 +57,29 @@ func GetUserByEmail(db *sqlx.DB, email string) (*User, error) {
 	}
 
 	return &user, nil
+}
+
+func UpdateUser(db *sqlx.DB, updatedUser User) (int, error) {
+	updatedUser.Email = strings.TrimSpace(strings.ToLower(updatedUser.Email))
+	res, err := db.NamedExec(UpdateUserSQL, updatedUser)
+	if err != nil {
+
+		logger.Error("[Update User]: Could not update user", err.Error())
+		return http.StatusInternalServerError, errors.New("internal server error")
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		logger.Error("[Update User]: Could not verify updated user", err.Error())
+		return http.StatusInternalServerError, errors.New("internal server error")
+	}
+
+	if rowsAffected == 0 {
+		logger.Error("[Update User]: Could not find user with given ID", nil)
+		return http.StatusNotFound, errors.New("no user found with given ID")
+	}
+
+	return http.StatusOK, nil
 }
 
 func DeleteUserByID(db *sqlx.DB, id int) (int, error) {
