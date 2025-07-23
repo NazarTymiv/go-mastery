@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"net/http"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/nazartymiv/go-mastery/Week-2/Day-14-bank-api/logger"
@@ -19,6 +20,7 @@ const (
 	GetAllAccountsSQL         = `SELECT * FROM accounts ORDER BY id LIMIT ? OFFSET ?`
 	GetAllAccountsByUserIdSQL = `SELECT * FROM accounts WHERE user_id = ? ORDER BY id`
 	CreateNewAccountSQL       = `INSERT INTO accounts (user_id, account_name, balance) VALUES(:user_id, :account_name, :balance)`
+	DeleteAccountByIdSQL      = `DELETE FROM accounts WHERE id = ?`
 )
 
 func (a *Account) Validate() error {
@@ -68,4 +70,25 @@ func CreateNewAccount(db *sqlx.DB, newAccount *Account) error {
 
 	newAccount.ID = int(accountId)
 	return nil
+}
+
+func DeleteAccountById(db *sqlx.DB, id int) (int, error) {
+	res, err := db.Exec(DeleteAccountByIdSQL, id)
+	if err != nil {
+		logger.Error("[Delete Account DB]: Could not delete account", err.Error())
+		return http.StatusInternalServerError, errors.New("server error")
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		logger.Error("[Delete Account DB]: Could not verify deletion account", err.Error())
+		return http.StatusInternalServerError, errors.New("server error")
+	}
+
+	if rowsAffected == 0 {
+		logger.Error("[Delete Account DB]: Could not find account with provided id", nil)
+		return http.StatusNotFound, errors.New("could not found account")
+	}
+
+	return http.StatusOK, nil
 }
