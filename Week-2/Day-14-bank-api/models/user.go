@@ -18,7 +18,7 @@ type User struct {
 
 // SQL requests
 const (
-	GetAllUsersSql    = `SELECT * FROM users`
+	GetAllUsersSql    = `SELECT * FROM users ORDER BY id LIMIT ? OFFSET ?`
 	GetUserByEmailSQL = `SELECT * FROM users WHERE email = ?`
 	CreateUserSQL     = `INSERT INTO users (name, email) VALUES(:name, :email)`
 	UpdateUserSQL     = `UPDATE users SET name = :name, email = :email WHERE id = :id`
@@ -37,8 +37,8 @@ func (u *User) Validate() error {
 	return nil
 }
 
-func GetAllUsers(users *[]User, db *sqlx.DB) error {
-	err := db.Select(users, GetAllUsersSql)
+func GetAllUsers(users *[]User, db *sqlx.DB, limit int, offset int) error {
+	err := db.Select(users, GetAllUsersSql, limit, offset)
 	if err != nil {
 		return errors.New(err.Error())
 	}
@@ -63,7 +63,6 @@ func UpdateUser(db *sqlx.DB, updatedUser User) (int, error) {
 	updatedUser.Email = strings.TrimSpace(strings.ToLower(updatedUser.Email))
 	res, err := db.NamedExec(UpdateUserSQL, updatedUser)
 	if err != nil {
-
 		logger.Error("[Update User]: Could not update user", err.Error())
 		return http.StatusInternalServerError, errors.New("internal server error")
 	}
