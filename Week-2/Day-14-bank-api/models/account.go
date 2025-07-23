@@ -16,8 +16,9 @@ type Account struct {
 
 // SQL requests
 const (
-	GetAllAccountsSQL   = `SELECT * FROM accounts ORDER BY id LIMIT ? OFFSET ?`
-	CreateNewAccountSQL = `INSERT INTO accounts (user_id, account_name, balance) VALUES(:user_id, :account_name, :balance)`
+	GetAllAccountsSQL         = `SELECT * FROM accounts ORDER BY id LIMIT ? OFFSET ?`
+	GetAllAccountsByUserIdSQL = `SELECT * FROM accounts WHERE user_id = ? ORDER BY id`
+	CreateNewAccountSQL       = `INSERT INTO accounts (user_id, account_name, balance) VALUES(:user_id, :account_name, :balance)`
 )
 
 func (a *Account) Validate() error {
@@ -38,6 +39,14 @@ func (a *Account) Validate() error {
 
 func GetAllAccounts(db *sqlx.DB, accounts *[]Account, limit int, offset int) error {
 	err := db.Select(accounts, GetAllAccountsSQL, limit, offset)
+	if err != nil {
+		return errors.New(err.Error())
+	}
+	return nil
+}
+
+func GetAllAccountsByUserId(db *sqlx.DB, accounts *[]Account, userId int) error {
+	err := db.Select(accounts, GetAllAccountsByUserIdSQL, userId)
 	if err != nil {
 		return errors.New(err.Error())
 	}
