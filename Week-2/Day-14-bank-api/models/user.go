@@ -19,6 +19,7 @@ type User struct {
 // SQL requests
 const (
 	GetAllUsersSql    = `SELECT * FROM users ORDER BY id LIMIT ? OFFSET ?`
+	GetUserByIdSQL    = `SELECT * FROM users WHERE id = ?`
 	GetUserByEmailSQL = `SELECT * FROM users WHERE email = ?`
 	CreateUserSQL     = `INSERT INTO users (name, email) VALUES(:name, :email)`
 	UpdateUserSQL     = `UPDATE users SET name = :name, email = :email WHERE id = :id`
@@ -43,6 +44,20 @@ func GetAllUsers(users *[]User, db *sqlx.DB, limit int, offset int) error {
 		return errors.New(err.Error())
 	}
 	return nil
+}
+
+func GetUserById(db *sqlx.DB, userId int) (*User, error) {
+	var user User
+	err := db.Get(&user, GetUserByIdSQL, userId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return &user, nil
 }
 
 func GetUserByEmail(db *sqlx.DB, email string) (*User, error) {
