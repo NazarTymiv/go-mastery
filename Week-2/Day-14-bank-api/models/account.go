@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"errors"
 	"net/http"
 
@@ -19,6 +20,7 @@ type Account struct {
 const (
 	GetAllAccountsSQL         = `SELECT * FROM accounts ORDER BY id LIMIT ? OFFSET ?`
 	GetAllAccountsByUserIdSQL = `SELECT * FROM accounts WHERE user_id = ? ORDER BY id`
+	GetAccountByIdSQL         = `SELECT * FROM accounts WHERE id = ?`
 	CreateNewAccountSQL       = `INSERT INTO accounts (user_id, account_name, balance) VALUES(:user_id, :account_name, :balance)`
 	DeleteAccountByIdSQL      = `DELETE FROM accounts WHERE id = ?`
 )
@@ -39,6 +41,10 @@ func (a *Account) Validate() error {
 	return nil
 }
 
+func (a *Account) GetBalance() float64 {
+	return *a.Balance
+}
+
 func GetAllAccounts(db *sqlx.DB, accounts *[]Account, limit int, offset int) error {
 	err := db.Select(accounts, GetAllAccountsSQL, limit, offset)
 	if err != nil {
@@ -53,6 +59,20 @@ func GetAllAccountsByUserId(db *sqlx.DB, accounts *[]Account, userId int) error 
 		return errors.New(err.Error())
 	}
 	return nil
+}
+
+func GetAccountById(db *sqlx.DB, accountId int) (*Account, error) {
+	var account Account
+	err := db.Get(&account, GetAccountByIdSQL, accountId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return &account, nil
 }
 
 func CreateNewAccount(db *sqlx.DB, newAccount *Account) error {
