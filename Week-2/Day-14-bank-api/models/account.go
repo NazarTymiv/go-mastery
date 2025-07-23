@@ -16,6 +16,7 @@ type Account struct {
 
 // SQL requests
 const (
+	GetAllAccountsSQL   = `SELECT * FROM accounts ORDER BY id LIMIT ? OFFSET ?`
 	CreateNewAccountSQL = `INSERT INTO accounts (user_id, account_name, balance) VALUES(:user_id, :account_name, :balance)`
 )
 
@@ -32,6 +33,14 @@ func (a *Account) Validate() error {
 		return errors.New("balance is required")
 	}
 
+	return nil
+}
+
+func GetAllAccounts(db *sqlx.DB, accounts *[]Account, limit int, offset int) error {
+	err := db.Select(accounts, GetAllAccountsSQL, limit, offset)
+	if err != nil {
+		return errors.New(err.Error())
+	}
 	return nil
 }
 
