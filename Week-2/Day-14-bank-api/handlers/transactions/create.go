@@ -2,6 +2,7 @@ package transactions
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/nazartymiv/go-mastery/Week-2/Day-14-bank-api/helpers"
@@ -26,32 +27,12 @@ func (h TransactionHandler) CreateNewTransaction(w http.ResponseWriter, r *http.
 		return
 	}
 
-	// Getting sender and receiver accounts
-	senderAccount, err := models.GetAccountById(h.DB, newTransaction.Sender)
+	// Begin transaction
+	statusCode, err := models.CreateTransaction(h.DB, &newTransaction)
 	if err != nil {
-		helpers.SendError(w, "Server error", http.StatusInternalServerError)
-		logger.Error("[Create New Transaction Handler]: Could not get sender account", err.Error())
+		helpers.SendError(w, err.Error(), statusCode)
 		return
 	}
 
-	if senderAccount == nil {
-		helpers.SendError(w, "Could not find sender account with provided id", http.StatusNotFound)
-		logger.Error("[Create New Transaction Handler]: could not find sender account", nil)
-		return
-	}
-
-	receiverAccount, err := models.GetAccountById(h.DB, newTransaction.Receiver)
-	if err != nil {
-		helpers.SendError(w, "Server error", http.StatusInternalServerError)
-		logger.Error("[Create New Transaction Handler]: Could not get receiver account", err.Error())
-		return
-	}
-
-	if receiverAccount == nil {
-		helpers.SendError(w, "Could not find receiver account with provided id", http.StatusNotFound)
-		logger.Error("[Create New Transaction Handler]: could not find receiver account", nil)
-		return
-	}
-
-	//
+	helpers.SendSuccess(w, helpers.MessageResponse{Message: fmt.Sprintf("Account with id %v successfully sent £%.2f to account with id %v", *newTransaction.Sender, *newTransaction.Amount, *newTransaction.Receiver)}, statusCode)
 }
