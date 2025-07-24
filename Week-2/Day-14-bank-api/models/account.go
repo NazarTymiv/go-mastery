@@ -61,7 +61,7 @@ func GetAllAccountsByUserId(db *sqlx.DB, accounts *[]Account, userId int) error 
 	return nil
 }
 
-func GetAccountById(db *sqlx.DB, accountId int) (*Account, error) {
+func GetAccountById(db *sqlx.DB, accountId *int) (*Account, error) {
 	var account Account
 	err := db.Get(&account, GetAccountByIdSQL, accountId)
 	if err != nil {

@@ -20,7 +20,7 @@ func (h AccountHandler) GetBalanceOfAccount(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Find account by id
-	foundAccount, err := models.GetAccountById(h.DB, id)
+	foundAccount, err := models.GetAccountById(h.DB, &id)
 	if err != nil {
 		helpers.SendError(w, "Server error", http.StatusInternalServerError)
 		logger.Error("[Get Balance of Account]: Could not get balance of account", err.Error())
@@ -33,6 +33,6 @@ func (h AccountHandler) GetBalanceOfAccount(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	helpers.SendSuccess(w, map[string]float64{"balance": *foundAccount.Balance}, http.StatusOK)
+	helpers.SendSuccess(w, map[string]float64{"balance": foundAccount.GetBalance()}, http.StatusOK)
 	logger.Info("[Get Balance of Account]: Successfully got balance of account", foundAccount.Balance)
 }
