@@ -19,6 +19,7 @@ const (
 
 const (
 	GetAccountBalanceSQL            = `SELECT balance FROM accounts WHERE id = ? FOR UPDATE`
+	GetAllTransactionsSQL           = `SELECT * FROM transactions ORDER BY id LIMIT ? OFFSET ?`
 	UpdateSenderAccountBalanceSQL   = `UPDATE accounts SET balance = balance - :amount WHERE id = :from_account_id`
 	UpdateReceiverAccountBalanceSQL = `UPDATE accounts SET balance = balance + :amount WHERE id = :to_account_id`
 	InsertTransactionRecordSQL      = `INSERT INTO transactions (from_account_id, to_account_id, amount, type, description, created_at) VALUES (:from_account_id, :to_account_id, :amount, :type, :description, :created_at)`
@@ -55,6 +56,14 @@ func (t *Transaction) Validate() error {
 		return errors.New("description is required")
 	}
 
+	return nil
+}
+
+func GetAllTransactions(db *sqlx.DB, transactions *[]Transaction, limit int, offset int) error {
+	err := db.Select(transactions, GetAllTransactionsSQL, limit, offset)
+	if err != nil {
+		return errors.New(err.Error())
+	}
 	return nil
 }
 

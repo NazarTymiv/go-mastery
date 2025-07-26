@@ -39,6 +39,7 @@ func SetupRoutes(database *sqlx.DB) http.Handler {
 			r.Delete("/accounts/{id}", accountsHandler.DeleteAccount)
 
 			// Transactions routes
+			r.Get("/transactions", transactionsHandler.GetAllTransactions)
 			r.Post("/transactions", transactionsHandler.CreateNewTransaction)
 		})
 	})
