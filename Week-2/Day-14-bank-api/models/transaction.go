@@ -24,6 +24,7 @@ const (
 	UpdateSenderAccountBalanceSQL   = `UPDATE accounts SET balance = balance - :amount WHERE id = :from_account_id`
 	UpdateReceiverAccountBalanceSQL = `UPDATE accounts SET balance = balance + :amount WHERE id = :to_account_id`
 	InsertTransactionRecordSQL      = `INSERT INTO transactions (from_account_id, to_account_id, amount, type, description, created_at) VALUES (:from_account_id, :to_account_id, :amount, :type, :description, :created_at)`
+	DeleteTransactionSQL            = `DELETE FROM transactions WHERE id = ?`
 )
 
 type Transaction struct {
@@ -148,4 +149,25 @@ func CreateTransaction(db *sqlx.DB, t *Transaction) (statusCode int, err error) 
 	}
 
 	return
+}
+
+func DeleteTransaction(db *sqlx.DB, id int) (int, error) {
+	res, err := db.Exec(DeleteTransactionSQL, id)
+	if err != nil {
+		logger.Error("[Delete Transaction DB]: could not delete transaction", err.Error())
+		return http.StatusInternalServerError, errors.New("server error")
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		logger.Error("[Delete Transaction DB]: Could not verify transaction deletion", err.Error())
+		return http.StatusInternalServerError, errors.New("server error")
+	}
+
+	if rowsAffected == 0 {
+		logger.Error("[Delete Transaction DB]: Could not find transaction with provided id", nil)
+		return http.StatusNotFound, errors.New("could not find transaction with provided id")
+	}
+
+	return http.StatusOK, nil
 }
