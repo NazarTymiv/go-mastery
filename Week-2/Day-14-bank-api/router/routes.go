@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/nazartymiv/go-mastery/Week-2/Day-14-bank-api/handlers/accounts"
+	"github.com/nazartymiv/go-mastery/Week-2/Day-14-bank-api/handlers/status"
 	"github.com/nazartymiv/go-mastery/Week-2/Day-14-bank-api/handlers/transactions"
 	"github.com/nazartymiv/go-mastery/Week-2/Day-14-bank-api/handlers/users"
 	customMiddleware "github.com/nazartymiv/go-mastery/Week-2/Day-14-bank-api/middleware"
@@ -20,6 +21,9 @@ func SetupRoutes(database *sqlx.DB) http.Handler {
 	usersHandler := users.UserHandler{DB: database}
 	accountsHandler := accounts.AccountHandler{DB: database}
 	transactionsHandler := transactions.TransactionHandler{DB: database}
+
+	// Server Health Check
+	r.Get("/ping", status.ServerHealthCheck)
 
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
