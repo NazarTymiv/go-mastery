@@ -10,7 +10,7 @@ import (
 	"github.com/nazartymiv/go-mastery/Week-2/Day-14-bank-api/models"
 )
 
-func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
+func (h UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {

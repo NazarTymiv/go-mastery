@@ -16,13 +16,13 @@ func (h UserHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	queryPage := r.URL.Query().Get("page")
 	queryLimit := r.URL.Query().Get("limit")
 
-	if queryLimit != "" {
+	if queryPage != "" {
 		if p, err := strconv.Atoi(queryPage); err == nil && p > 0 {
 			page = p
 		}
 	}
 
-	if queryPage != "" {
+	if queryLimit != "" {
 		if l, err := strconv.Atoi(queryLimit); err == nil && l > 0 {
 			limit = l
 		}

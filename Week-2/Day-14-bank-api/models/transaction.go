@@ -18,13 +18,13 @@ const (
 )
 
 const (
-	GetAccountBalanceSQL            = `SELECT balance FROM accounts WHERE id = ? FOR UPDATE`
-	GetAllTransactionsSQL           = `SELECT * FROM transactions ORDER BY id LIMIT ? OFFSET ?`
-	GetTransactionsByAccountSQL     = `SELECT * FROM transactions WHERE from_account_id = ? OR to_account_id = ? ORDER BY id LIMIT ? OFFSET ?`
-	UpdateSenderAccountBalanceSQL   = `UPDATE accounts SET balance = balance - :amount WHERE id = :from_account_id`
-	UpdateReceiverAccountBalanceSQL = `UPDATE accounts SET balance = balance + :amount WHERE id = :to_account_id`
-	InsertTransactionRecordSQL      = `INSERT INTO transactions (from_account_id, to_account_id, amount, type, description, created_at) VALUES (:from_account_id, :to_account_id, :amount, :type, :description, :created_at)`
-	DeleteTransactionSQL            = `DELETE FROM transactions WHERE id = ?`
+	GetBothAccountsForTransactionSQL = `SELECT * FROM accounts WHERE id IN (?, ?) ORDER BY id FOR UPDATE`
+	GetAllTransactionsSQL            = `SELECT * FROM transactions ORDER BY id LIMIT ? OFFSET ?`
+	GetTransactionsByAccountSQL      = `SELECT * FROM transactions WHERE from_account_id = ? OR to_account_id = ? ORDER BY id LIMIT ? OFFSET ?`
+	UpdateSenderAccountBalanceSQL    = `UPDATE accounts SET balance = balance - :amount WHERE id = :from_account_id`
+	UpdateReceiverAccountBalanceSQL  = `UPDATE accounts SET balance = balance + :amount WHERE id = :to_account_id`
+	InsertTransactionRecordSQL       = `INSERT INTO transactions (from_account_id, to_account_id, amount, type, description, created_at) VALUES (:from_account_id, :to_account_id, :amount, :type, :description, :created_at)`
+	DeleteTransactionSQL             = `DELETE FROM transactions WHERE id = ?`
 )
 
 type Transaction struct {
@@ -99,25 +99,39 @@ func CreateTransaction(db *sqlx.DB, t *Transaction) (statusCode int, err error) 
 		}
 	}()
 
-	// Lock sender account
-	var senderBalance float64
-	err = tx.Get(&senderBalance, GetAccountBalanceSQL, *t.Sender)
+	// Lock both accounts in one query to avoid deadlocks
+	var accounts []Account
+	err = tx.Select(&accounts, GetBothAccountsForTransactionSQL, *t.Sender, *t.Receiver)
 	if err != nil {
-		logger.Error("[Create Transaction DB]: Couldn't find sender account", err.Error())
-		return http.StatusNotFound, errors.New("couldn't find sender account")
+		logger.Error("[Create Transaction DB]: Failed to lock accounts", err.Error())
+		return http.StatusInternalServerError, errors.New("server error")
 	}
 
-	if senderBalance < *t.Amount {
-		logger.Error("[Create Transaction DB]: Insufficient balance", t.Sender)
-		return http.StatusBadRequest, errors.New("insufficient balance")
+	if len(accounts) != 2 {
+		logger.Error("[Create Transaction DB]: One or both accounts not found", accounts)
+		return http.StatusNotFound, errors.New("sender or receiver account not found")
 	}
 
-	// Lock receiver account
-	var receiverBalance float64
-	err = tx.Get(&receiverBalance, GetAccountBalanceSQL, *t.Receiver)
-	if err != nil {
-		logger.Error("[Create Transaction DB]: Couldn't find receiver account", err.Error())
-		return http.StatusNotFound, errors.New("couldn't find receiver account")
+	// Identify sender and receiver accounts from result
+	var senderAccount, receiverAccount *Account
+	for i := range accounts {
+		switch accounts[i].ID {
+		case *t.Sender:
+			senderAccount = &accounts[i]
+		case *t.Receiver:
+			receiverAccount = &accounts[i]
+		}
+	}
+
+	if senderAccount == nil || receiverAccount == nil {
+		logger.Error("[Create Transaction DB]: Failed to assign sender/receiver", accounts)
+		return http.StatusInternalServerError, errors.New("failed to process accounts")
+	}
+
+	// Validate sender has enough balance
+	if *senderAccount.Balance < *t.Amount {
+		logger.Error("[Create Transaction DB]: Insufficient balance", senderAccount)
+		return http.StatusBadRequest, errors.New("insufficient balance in sender account")
 	}
 
 	// Update sender balance
