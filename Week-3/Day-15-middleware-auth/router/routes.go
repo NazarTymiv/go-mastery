@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"github.com/nazartymiv/go-mastery/Week-3/Day-15-middleware/handlers/auth"
 	customMiddleware "github.com/nazartymiv/go-mastery/Week-3/Day-15-middleware/middleware"
 )
 
@@ -16,6 +17,11 @@ func SetupRoutes() http.Handler {
 
 	r.Route("/api", func(r chi.Router) {
 		r.Use(customMiddleware.RequestLogger)
+
+		r.Post("/register", auth.Register)
+		r.Post("/login", auth.Login)
+		r.Post("/logout", auth.Logout)
+		r.Get("/protected", auth.Protected)
 	})
 
 	return r
