@@ -20,8 +20,8 @@ func SetupRoutes() http.Handler {
 
 		r.Post("/register", auth.Register)
 		r.Post("/login", auth.Login)
-		r.Post("/logout", auth.Logout)
-		r.Get("/protected", auth.Protected)
+		r.Post("/logout", customMiddleware.Authorize(auth.Logout))
+		r.Get("/protected", customMiddleware.Authorize(auth.Protected))
 	})
 
 	return r
